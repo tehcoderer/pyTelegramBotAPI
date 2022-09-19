@@ -261,9 +261,11 @@ class AsyncTeleBot:
         if skip_pending:
             await self.skip_updates()
         self._polling = True
+        non_stop = kwargs.get("non_stop", False)
+        kwargs.pop("non_stop", None)
         while self._polling:
             try:
-                await self._process_polling(non_stop=False, timeout=timeout, request_timeout=request_timeout,
+                await self._process_polling(non_stop=non_stop, timeout=timeout, request_timeout=request_timeout,
                              allowed_updates=allowed_updates, *args, **kwargs)
             except Exception as e:
                 if logger_level and logger_level >= logging.ERROR:
