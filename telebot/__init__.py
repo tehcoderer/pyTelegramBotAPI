@@ -948,12 +948,15 @@ class TeleBot:
         if skip_pending:
             self.__skip_updates()
 
+        non_stop = kwargs.get("non_stop", True)
+        kwargs.pop("non_stop", None)
+
         if restart_on_change:
             self._setup_change_detector(path_to_watch)
 
         while not self.__stop_polling.is_set():
             try:
-                self.polling(non_stop=True, timeout=timeout, long_polling_timeout=long_polling_timeout,
+                self.polling(non_stop=non_stop, timeout=timeout, long_polling_timeout=long_polling_timeout,
                              logger_level=logger_level, allowed_updates=allowed_updates, restart_on_change=False,
                              *args, **kwargs)
             except Exception as e:

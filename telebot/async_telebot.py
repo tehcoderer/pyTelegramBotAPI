@@ -355,6 +355,9 @@ class AsyncTeleBot:
             await self.skip_updates()
         self._polling = True
 
+        non_stop = kwargs.get("non_stop", False)
+        kwargs.pop("non_stop", None)
+
         if restart_on_change:
             self._setup_change_detector(path_to_watch)
 
