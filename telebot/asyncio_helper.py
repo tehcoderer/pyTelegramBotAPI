@@ -45,7 +45,7 @@ class SessionManager:
         if self.session is None:
             self.session = await self.create_session()
             return self.session
-            
+
         if self.session.closed:
             self.session = await self.create_session()
 
@@ -74,9 +74,9 @@ async def _process_request(token, url, method='get', params=None, files=None, **
         request_timeout = params.pop('timeout', None) if params else None
         # we will apply default request_timeout if there is no timeout in params
         # otherwise, we will use timeout parameter applied for payload.
-    
+
     request_timeout = REQUEST_TIMEOUT if request_timeout is None else request_timeout
-    
+
 
     # Preparing data by adding all parameters and files to FormData
     params = _prepare_data(params, files)
@@ -91,7 +91,7 @@ async def _process_request(token, url, method='get', params=None, files=None, **
             async with session.request(method=method, url=API_URL.format(token, url), data=params, timeout=timeout, proxy=proxy) as resp:
                 got_result = True
                 logger.debug("Request: method={0} url={1} params={2} files={3} request_timeout={4} current_try={5}".format(method, url, params, files, request_timeout, current_try).replace(token, token.split(':')[0] + ":{TOKEN}"))
-                
+
                 json_result = await _check_result(url, resp)
                 if json_result:
                     return json_result['result']
@@ -103,7 +103,7 @@ async def _process_request(token, url, method='get', params=None, files=None, **
             logger.error(f'Unknown error: {e.__class__.__name__}')
         if not got_result:
             raise RequestTimeout("Request timeout. Request: method={0} url={1} params={2} files={3} request_timeout={4}".format(method, url, params, files, request_timeout, current_try))
-        
+
 def _prepare_file(obj):
     """
     Prepares file for upload.
@@ -186,7 +186,7 @@ async def download_file(token, file_path):
         if response.status != 200:
             raise ApiHTTPException('Download file', result)
         result = await response.read()
-    
+
     return result
 
 
@@ -267,10 +267,10 @@ async def _check_result(method_name, result):
             raise ApiHTTPException(method_name, result)
         else:
             raise ApiInvalidJSONException(method_name, result)
-    else:    
+    else:
         if not result_json['ok']:
             raise ApiTelegramException(method_name, result, result_json)
-            
+
         return result_json
 
 
@@ -315,7 +315,7 @@ async def send_message(
         params['allow_sending_without_reply'] = allow_sending_without_reply
     if protect_content is not None:
         params['protect_content'] = protect_content
-    
+
     return await _process_request(token, method_name, params=params)
 
 # methods
@@ -513,8 +513,8 @@ async def send_media_group(
 
 async def send_location(
         token, chat_id, latitude, longitude,
-        live_period=None, reply_to_message_id=None, 
-        reply_markup=None, disable_notification=None, 
+        live_period=None, reply_to_message_id=None,
+        reply_markup=None, disable_notification=None,
         timeout=None, horizontal_accuracy=None, heading=None,
         proximity_alert_radius=None, allow_sending_without_reply=None, protect_content=None):
     method_url = r'sendLocation'
@@ -650,7 +650,7 @@ async def send_chat_action(token, chat_id, action, timeout=None):
 
 
 async def send_video(token, chat_id, data, duration=None, caption=None, reply_to_message_id=None, reply_markup=None,
-               parse_mode=None, supports_streaming=None, disable_notification=None, timeout=None, 
+               parse_mode=None, supports_streaming=None, disable_notification=None, timeout=None,
                thumb=None, width=None, height=None, caption_entities=None, allow_sending_without_reply=None,
                protect_content=None):
     method_url = r'sendVideo'
@@ -1183,9 +1183,9 @@ async def set_my_commands(token, commands, scope=None, language_code=None):
 async def delete_my_commands(token, scope=None, language_code=None):
     method_url = r'deleteMyCommands'
     payload = {}
-    if scope: 
+    if scope:
         payload['scope'] = scope.to_json()
-    if language_code: 
+    if language_code:
         payload['language_code'] = language_code
     return await _process_request(token, method_url, params=payload, method='post')
 
@@ -1802,10 +1802,10 @@ class ApiException(Exception):
         super(ApiException, self).__init__("A request to the Telegram API was unsuccessful. {0}".format(msg))
         self.function_name = function_name
         self.result = result
-    
+
 class ApiHTTPException(ApiException):
     """
-    This class represents an Exception thrown when a call to the 
+    This class represents an Exception thrown when a call to the
     Telegram API server returns HTTP code that is not 200.
     """
     def __init__(self, function_name, result):
@@ -1814,10 +1814,10 @@ class ApiHTTPException(ApiException):
             .format(result.status_code, result.reason, result),
             function_name,
             result)
-    
+
 class ApiInvalidJSONException(ApiException):
     """
-    This class represents an Exception thrown when a call to the 
+    This class represents an Exception thrown when a call to the
     Telegram API server returns invalid json.
     """
     def __init__(self, function_name, result):
@@ -1826,7 +1826,7 @@ class ApiInvalidJSONException(ApiException):
             .format(result),
             function_name,
             result)
-    
+
 class ApiTelegramException(ApiException):
     """
     This class represents an Exception thrown when a Telegram API returns error code.
